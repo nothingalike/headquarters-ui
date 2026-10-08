@@ -1,0 +1,41 @@
+{
+  "name": "headquarters-ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A local web app for browsing, searching, and answering reports in ~/.headquarters.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "bin": {
+    "hq-ui": "server/main.ts"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n server,web -c blue,green \"node --watch server/main.ts --dev\" \"vite\"",
+    "build": "vite build",
+    "start": "npm run build && node server/main.ts",
+    "serve": "node server/main.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p server/tsconfig.json"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.17",
+    "hono": "^4.13.13",
+    "minisearch": "^7.2.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "react-markdown": "^10.1.0",
+    "react-router": "^7.18.4",
+    "remark-gfm": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "concurrently": "^9.2.5",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.7",
+    "vitest": "^3.2.7"
+  }
+}

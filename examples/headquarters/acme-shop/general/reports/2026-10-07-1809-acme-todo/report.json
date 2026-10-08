@@ -1,0 +1,34 @@
+{
+  "type": "todo",
+  "version": 1,
+  "title": "Acme to-do, Oct 7",
+  "summary": "Four things need you before the cart release, in the order to do them.",
+  "created": "2026-10-07T18:09",
+  "project": "acme-shop",
+  "sections": [
+    {
+      "id": "review",
+      "title": "Review before the agent builds",
+      "intro": "Both plans are written in their worktrees. Nothing is committed.",
+      "items": [
+        { "id": "approve-cart-plan", "ask": "check", "text": "Approve the **SHOP-004** inventory UI plan in `docs/plans/inventory-ui.md`" },
+        { "id": "release-day", "ask": "choice", "text": "Pick the release day for the cart migration", "options": ["Tuesday", "Thursday"] }
+      ]
+    },
+    {
+      "id": "emails",
+      "title": "Emails",
+      "items": [
+        { "id": "email-dana-tax", "ask": "check", "text": "Send Dana the gift card tax question", "waitingOn": "Dana", "detail": "Hi Dana,\n\nWhich tax rule applies to gift cards: the item's rule, or exempt? And does it differ by state?\n\nThanks" },
+        { "id": "gift-card-tax", "ask": "text", "text": "When Dana answers, which tax rule applies to gift cards?" }
+      ]
+    },
+    {
+      "id": "fyi",
+      "title": "For your information",
+      "items": [
+        { "id": "build-green", "text": "The build on `main` is green after the SHOP-003 schema change." }
+      ]
+    }
+  ]
+}

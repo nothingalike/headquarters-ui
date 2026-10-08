@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acme to-do, Oct 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: a header with the answer prompt over one reading column; numbered sections in the report's order, divided by rules. */
+/* Color: paper, ink, muted, rule, panel, accent (ledger blue) + warn for waiting and for questions. */
+/* Type: display = IBM Plex Sans Condensed; body = IBM Plex Sans; mono = IBM Plex Mono for ids, paths, and counts. */
+:root {
+  --bg: #f6f7f9; --fg: #17202b; --muted: #5b6676; --rule: #d6dbe3; --panel: #ffffff;
+  --accent: #1f5fa8; --accent-soft: #e4edf8; --warn: #9a6200; --warn-soft: #fbf0d9;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #11161d; --fg: #e3e8ef; --muted: #98a3b3; --rule: #2a333f; --panel: #171e27;
+  --accent: #7fb0ea; --accent-soft: #1b2a3d; --warn: #e7b65a; --warn-soft: #2d2412; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #11161d; --fg: #e3e8ef; --muted: #98a3b3; --rule: #2a333f; --panel: #171e27;
+  --accent: #7fb0ea; --accent-soft: #1b2a3d; --warn: #e7b65a; --warn-soft: #2d2412; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.55 var(--body); padding-inline: 16px; }
+main { max-width: 860px; margin: 0 auto; padding: 32px 0 64px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 30px; }
+main > * { min-width: 0; }
+h1, h2 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: 32px; }
+h2 { font-size: 21px; padding-bottom: 8px; border-bottom: 1px solid var(--rule); display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+h2 .n { color: var(--accent); font-variant-numeric: tabular-nums; }
+.count { font: 500 13px var(--body); color: var(--muted); }
+p { margin: 0 0 10px; max-width: 72ch; }
+.kicker { font: 600 12px var(--body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+header { display: grid; gap: 10px; }
+.lede { color: var(--muted); }
+.answer-here { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: baseline; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); font-size: 14px; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
+code { background: var(--accent-soft); padding: .05em .35em; border-radius: 4px; overflow-wrap: anywhere; }
+pre { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font-size: 13px; }
+pre code { background: none; padding: 0; overflow-wrap: normal; }
+a { color: var(--accent); }
+ul.md, ol.md { margin: 0 0 10px; padding-left: 1.4em; }
+ol.items { list-style: none; margin: 0; padding: 0; }
+ol.items > li { display: flex; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--rule); }
+.mark { flex: none; width: 16px; height: 16px; margin-top: 4px; border: 1.6px solid var(--muted); border-radius: 3px; }
+.mark.text, .mark.choice { border-radius: 50%; border-color: var(--warn); }
+.mark.info { border: 0; position: relative; }
+.mark.info::after { content: ""; position: absolute; left: 5px; top: 5px; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.body { display: grid; gap: 8px; min-width: 0; flex: 1; }
+.body > :last-child { margin-bottom: 0; }
+.info .text { color: var(--muted); }
+.detail { position: relative; padding: 10px 14px; border: 1px solid var(--rule); border-radius: 6px; background: var(--panel); font-size: 14px; }
+.detail .md-root { padding-right: 56px; }
+.copy { position: absolute; top: 8px; right: 8px; border: 1px solid var(--rule); background: var(--bg); color: var(--fg); border-radius: 4px; padding: 2px 8px; font: 12px var(--body); cursor: pointer; }
+.pill { display: inline-block; justify-self: start; font: 500 12px var(--body); padding: 1px 8px; border-radius: 10px; background: var(--warn-soft); color: var(--warn); }
+.options { display: flex; flex-wrap: wrap; gap: 6px; }
+.option { font-size: 13px; padding: 2px 10px; border: 1px solid var(--rule); border-radius: 12px; background: var(--panel); }
+.intro { color: var(--muted); margin-top: 10px; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media print { .copy, .answer-here { display: none; } section { break-inside: avoid; } }
+</style>
+</head>
+<body>
+<main id="page"></main>
+<script type="application/json" id="report-data">
+{
+  "type": "todo",
+  "version": 1,
+  "title": "Acme to-do, Oct 7",
+  "summary": "Four things need you before the cart release, in the order to do them.",
+  "created": "2026-10-07T18:09",
+  "project": "acme-shop",
+  "sections": [
+    {
+      "id": "review",
+      "title": "Review before the agent builds",
+      "intro": "Both plans are written in their worktrees. Nothing is committed.",
+      "items": [
+        {
+          "id": "approve-cart-plan",
+          "ask": "check",
+          "text": "Approve the **SHOP-004** inventory UI plan in `docs/plans/inventory-ui.md`"
+        },
+        {
+          "id": "release-day",
+          "ask": "choice",
+          "text": "Pick the release day for the cart migration",
+          "options": [
+            "Tuesday",
+            "Thursday"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "emails",
+      "title": "Emails",
+      "items": [
+        {
+          "id": "email-dana-tax",
+          "ask": "check",
+          "text": "Send Dana the gift card tax question",
+          "waitingOn": "Dana",
+          "detail": "Hi Dana,\n\nWhich tax rule applies to gift cards: the item's rule, or exempt? And does it differ by state?\n\nThanks"
+        },
+        {
+          "id": "gift-card-tax",
+          "ask": "text",
+          "text": "When Dana answers, which tax rule applies to gift cards?"
+        }
+      ]
+    },
+    {
+      "id": "fyi",
+      "title": "For your information",
+      "items": [
+        {
+          "id": "build-green",
+          "text": "The build on `main` is green after the SHOP-003 schema change."
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script type="application/json" id="app-link">"http://localhost:4321/f/acme-shop/general/reports/2026-10-07-1809-acme-todo"</script>
+<script>
+(function () {
+  var report = JSON.parse(document.getElementById("report-data").textContent);
+  var appLink = JSON.parse(document.getElementById("app-link").textContent);
+  var page = document.getElementById("page");
+  document.title = report.title;
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+  // Enough Markdown for report text: paragraphs, lists, fenced code, `code`, **bold**, *italic*, [links](url).
+  function inline(s) {
+    var codes = [];
+    s = esc(s).replace(/`([^`]+)`/g, function (_, c) { codes.push(c); return "\u0000" + (codes.length - 1) + "\u0000"; });
+    s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (_, t, u) { return '<a href="' + u + '">' + t + "</a>"; })
+         .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
+         .replace(/(^|[^*])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+    return s.replace(/\u0000(\d+)\u0000/g, function (_, i) { return "<code>" + codes[i] + "</code>"; });
+  }
+  function md(src) {
+    var out = [], lines = String(src || "").split(/\r?\n/), i = 0;
+    while (i < lines.length) {
+      var line = lines[i];
+      if (/^```/.test(line)) {
+        var code = []; i++;
+        while (i < lines.length && !/^```/.test(lines[i])) code.push(lines[i++]);
+        i++; out.push("<pre><code>" + esc(code.join("\n")) + "</code></pre>"); continue;
+      }
+      var list = line.match(/^\s*([-*]|\d+\.)\s+/);
+      if (list) {
+        var ordered = /\d/.test(list[1]), items = [];
+        while (i < lines.length && /^\s*([-*]|\d+\.)\s+/.test(lines[i])) items.push(inline(lines[i++].replace(/^\s*([-*]|\d+\.)\s+/, "")));
+        out.push((ordered ? '<ol class="md">' : '<ul class="md">') + items.map(function (t) { return "<li>" + t + "</li>"; }).join("") + (ordered ? "</ol>" : "</ul>"));
+        continue;
+      }
+      if (!line.trim()) { i++; continue; }
+      var para = [];
+      while (i < lines.length && lines[i].trim() && !/^```/.test(lines[i]) && !/^\s*([-*]|\d+\.)\s+/.test(lines[i])) para.push(lines[i++]);
+      out.push("<p>" + inline(para.join(" ")) + "</p>");
+    }
+    return '<div class="md-root">' + out.join("") + "</div>";
+  }
+
+  var details = [];
+  var asked = 0;
+  report.sections.forEach(function (s) { s.items.forEach(function (it) { if (it.ask) asked++; }); });
+  var kicker = [report.project, report.story, report.created && new Date(report.created).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })].filter(Boolean).join(" · ");
+
+  var html = "<header>" + (kicker ? '<div class="kicker">' + esc(kicker) + "</div>" : "") + "<h1>" + esc(report.title) + "</h1>" +
+    (report.summary ? '<div class="lede">' + md(report.summary) + "</div>" : "");
+  if (asked) {
+    html += '<div class="answer-here"><strong>' + asked + (asked === 1 ? " item asks" : " items ask") + " for your answer.</strong>" +
+      (appLink ? '<span>Answer them in <a href="' + esc(appLink) + '">Headquarters UI</a>, which saves them to <code>answers.json</code> beside this page.</span>'
+               : "<span>Answer them in Headquarters UI, which saves them to <code>answers.json</code> beside this page.</span>") + "</div>";
+  }
+  html += "</header>";
+
+  report.sections.forEach(function (s, si) {
+    var n = s.items.filter(function (it) { return it.ask; }).length;
+    html += '<section id="section-' + esc(s.id) + '"><h2><span class="n">' + (si + 1) + "</span>" + esc(s.title) + (n ? '<span class="count">' + n + (n === 1 ? " ask" : " asks") + "</span>" : "") + "</h2>";
+    if (s.intro) html += '<div class="intro">' + md(s.intro) + "</div>";
+    html += '<ol class="items">';
+    s.items.forEach(function (it) {
+      html += '<li id="' + esc(it.id) + '" class="' + (it.ask ? "ask" : "info") + '"><span class="mark ' + (it.ask || "info") + '" aria-hidden="true"></span><div class="body">' +
+        '<div class="text">' + md(it.text) + "</div>" +
+        (it.waitingOn ? '<span class="pill">Waiting on ' + esc(it.waitingOn) + "</span>" : "") +
+        (it.options ? '<div class="options">' + it.options.map(function (o) { return '<span class="option">' + esc(o) + "</span>"; }).join("") + "</div>" : "") +
+        (it.detail ? '<div class="detail"><button class="copy" type="button" data-detail="' + (details.push(it.detail) - 1) + '">Copy</button>' + md(it.detail) + "</div>" : "") +
+        "</div></li>";
+    });
+    html += "</ol></section>";
+  });
+  page.innerHTML = html;
+
+  page.addEventListener("click", function (e) {
+    var btn = e.target.closest(".copy");
+    if (!btn) return;
+    var text = details[Number(btn.getAttribute("data-detail"))];
+    function done() { btn.textContent = "Copied"; setTimeout(function () { btn.textContent = "Copy"; }, 1500); }
+    function fallback() {
+      var ta = document.createElement("textarea"); ta.value = text; document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); done(); } catch (err) { /* text stays on screen to select */ }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done, fallback); else fallback();
+  });
+})();
+</script>
+</body>
+</html>
